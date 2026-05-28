@@ -11,6 +11,10 @@ spec:
           spec:
             template:
               spec:
+              {{- with .Values.imagePullSecrets }}
+                imagePullSecrets:
+                  {{- toYaml . | nindent 10 }}
+              {{- end }}
                 containers:
                   - image: {{ template "system_default_registry" . }}{{ .Values.images.nodeagent_fluentbit.repository }}:{{ .Values.images.nodeagent_fluentbit.tag }}
                     name: fluent-bit

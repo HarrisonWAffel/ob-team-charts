@@ -8,3 +8,20 @@
  spec:
    {{- with .fileTailers }}
    fileTailers:
+@@ -19,9 +20,14 @@
+   workloadMetaOverrides:
+     {{- toYaml . | nindent 4 }}
+   {{- end }}
+-  {{- with .workloadOverrides }}
++  {{- $workloadOverrides := .workloadOverrides | default dict }}
++  {{- if $.Values.imagePullSecrets }}
++    {{- $ipsOverride := dict "spec" (dict "template" (dict "spec" (dict "imagePullSecrets" $.Values.imagePullSecrets))) }}
++    {{- $workloadOverrides = merge $workloadOverrides $ipsOverride }}
++  {{- end }}
++  {{- if $workloadOverrides }}
+   workloadOverrides:
+-    {{- toYaml . | nindent 4 }}
++    {{- toYaml $workloadOverrides | nindent 4 }}
+   {{- end }}
+   {{- with .image }}
+   image:

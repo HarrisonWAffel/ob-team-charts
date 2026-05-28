@@ -1,6 +1,18 @@
 --- charts-original/templates/logging/fluentbit.yaml
 +++ charts/templates/logging/fluentbit.yaml
-@@ -8,6 +8,7 @@
+@@ -1,13 +1,17 @@
+ {{- if and .Values.logging.enabled (not .Values.logging.fluentbitDisabled) -}}
+-{{- $fluentbitSpec := .Values.logging.fluentbit }}
++{{- $fluentbitSpec := .Values.logging.fluentbit | default dict }}
+ {{- if .Values.logging.loggingRef }}
+-  {{- $fluentbitSpec := set .Values.logging.fluentbit "loggingRef" (default .Values.logging.loggingRef .Values.logging.fluentbit.loggingRef) -}}
++  {{- $_ := set $fluentbitSpec "loggingRef" (default .Values.logging.loggingRef ($fluentbitSpec.loggingRef | default "")) -}}
++{{- end }}
++{{- if .Values.imagePullSecrets }}
++  {{- $_ := set $fluentbitSpec "imagePullSecrets" .Values.imagePullSecrets }}
+ {{- end }}
+ 
+ apiVersion: logging.banzaicloud.io/v1beta1
  kind: FluentbitAgent
  metadata:
    name: {{ include "logging-operator.releasename" . }}

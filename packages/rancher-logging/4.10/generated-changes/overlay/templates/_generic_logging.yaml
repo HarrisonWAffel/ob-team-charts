@@ -11,6 +11,10 @@ spec:
     {{- with .Values.fluentd.logLevel }}
     logLevel: {{ . }}
     {{- end }}
+    {{- with .Values.imagePullSecrets }}
+    serviceAccount:
+      imagePullSecrets: {{- toYaml . | nindent 8 }}
+    {{- end }}
     image:
       repository: {{ template "system_default_registry" . }}{{ .Values.images.fluentd.repository }}
       tag: {{ .Values.images.fluentd.tag }}

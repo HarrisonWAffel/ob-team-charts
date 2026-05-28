@@ -8,3 +8,20 @@
    labels:
  {{ include "logging-operator.labels" . | indent 4 }}
  spec:
+@@ -19,8 +20,14 @@
+   flowConfigOverride: {{ . }}
+   {{- end }}
+   {{- if (not .Values.logging.fluentdDisabled) }}
+-  {{- if .Values.logging.fluentd }}
+-  fluentd: {{- toYaml .Values.logging.fluentd | nindent 4 }}
++  {{- $chartFluentd := dict }}
++  {{- if .Values.imagePullSecrets }}
++    {{- $_ := set $chartFluentd "serviceAccount" (dict "imagePullSecrets" .Values.imagePullSecrets) }}
++  {{- end }}
++  {{- $userFluentd := .Values.logging.fluentd | default dict }}
++  {{- $mergedFluentd := merge $userFluentd $chartFluentd }}
++  {{- if $mergedFluentd }}
++  fluentd: {{- toYaml $mergedFluentd | nindent 4 }}
+   {{- else }}
+   fluentd: {}
+   {{- end }}
